@@ -1,5 +1,8 @@
 package org.sid.ebankbackend;
 
+import org.sid.ebankbackend.dtos.CurrentBankAccountDTO;
+import org.sid.ebankbackend.dtos.CustomerDTO;
+import org.sid.ebankbackend.dtos.SavingBankAccountDTO;
 import org.sid.ebankbackend.entities.BankAccount;
 import org.sid.ebankbackend.entities.CurrentAccount;
 import org.sid.ebankbackend.entities.Customer;
@@ -35,14 +38,14 @@ public class EbankBackendApplication {
         };
     }
 
-    //@Bean
+    @Bean
     CommandLineRunner start(IEBankService ieBankService){
         return args -> {
             Stream.of("Aymane","Imad","Khalid").forEach(name->{
-                Customer customer = new Customer();
-                customer.setName(name);
-                customer.setEmail(name+"@gmail.com");
-                ieBankService.saveCustomer(customer);
+                CustomerDTO customerDTO = new CustomerDTO();
+                customerDTO.setName(name);
+                customerDTO.setEmail(name+"@gmail.com");
+                ieBankService.saveCustomer(customerDTO);
             });
 
             ieBankService.listCustomers().forEach(customer->{
@@ -57,8 +60,15 @@ public class EbankBackendApplication {
             ieBankService.listBankAccounts().forEach(bankAccount -> {
                 for (int i= 0; i<10; i++){
                     try {
-                        ieBankService.credit(bankAccount.getId(),1000+Math.random()*120000, "Credit");
-                        ieBankService.debit(bankAccount.getId(),1000+Math.random()*60000, "Debit");
+                        String accountID;
+                        if (bankAccount instanceof CurrentBankAccountDTO){
+                            accountID = ((CurrentBankAccountDTO)bankAccount).getId();
+                        }else {
+                            accountID = ((SavingBankAccountDTO)bankAccount).getId();
+                        }
+                        ieBankService.credit(accountID,1000+Math.random()*120000, "Credit");
+                        ieBankService.debit(accountID,1000+Math.random()*10000, "Debit");
+
                     } catch (BankAccountNotFoundException e)
                     {
                         e.printStackTrace();
