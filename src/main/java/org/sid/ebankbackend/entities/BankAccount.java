@@ -24,6 +24,6 @@ public class BankAccount { // abstract class if using table_per_class since we d
     private String currency;
     @ManyToOne
     private Customer customer;
-    @OneToMany(mappedBy = "bankAccount", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "bankAccount", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AccountOperation> operations;
 }

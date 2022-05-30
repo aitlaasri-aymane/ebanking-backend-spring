@@ -15,10 +15,12 @@ public interface IEBankService {
     void deleteCustomer(Long customerID);
     void deleteBankAccount(String bankAccountID);
     CustomerDTO getCustomerbyID(Long id) throws CustomerNotFoundException;
+    List<CustomerDTO> searchForCustumers(String keyword);
     CurrentBankAccountDTO saveCurrentAccount(Long bankAccountID, double balance, double overdraft) throws CustomerNotFoundException;
     SavingBankAccountDTO saveSavingAccount(Long bankAccountID, double balance, double interestRate) throws CustomerNotFoundException;
     List<CustomerDTO> listCustomers();
     List<BankAccountDTO> listBankAccounts();
+    List<BankAccountDTO> getBankAccountsByCustomerId(Long customerId);
     BankAccountDTO getBankAccountByID(String ID) throws BankAccountNotFoundException;
     void showBankAccDetail(String BankAccountID) throws BankAccountNotFoundException;
     void debit(String BankAccountID, double amount, String description) throws BankAccountNotFoundException, BalanceNotSufficentException;

@@ -2,8 +2,12 @@ package org.sid.ebankbackend.web;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sid.ebankbackend.dtos.CreditDTO;
 import org.sid.ebankbackend.dtos.CustomerDTO;
+import org.sid.ebankbackend.dtos.DebitDTO;
+import org.sid.ebankbackend.dtos.TransferDTO;
 import org.sid.ebankbackend.entities.Customer;
+import org.sid.ebankbackend.exceptions.BalanceNotSufficentException;
 import org.sid.ebankbackend.exceptions.CustomerNotFoundException;
 import org.sid.ebankbackend.services.IEBankService;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +17,7 @@ import java.util.List;
 @RestController // to verify API fast use /swagger-ui.html by using its dependancy springdoc openapi. Documentation in /v3/api-docs
 @AllArgsConstructor
 @Slf4j
+@CrossOrigin("*")
 public class CustomerRestController {
     private IEBankService ieBankService;
 
@@ -24,6 +29,11 @@ public class CustomerRestController {
     @GetMapping("/customers/{id}")
     public CustomerDTO findCustomerbyID(@PathVariable(name = "id") Long id) throws CustomerNotFoundException {
         return ieBankService.getCustomerbyID(id);
+    }
+
+    @GetMapping("/customers/search")
+    public List<CustomerDTO> searchCustomers(@RequestParam(name = "keyword",defaultValue = "") String keyword){
+        return ieBankService.searchForCustumers("%"+keyword+"%");
     }
 
     @PostMapping("/customers/add")

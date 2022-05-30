@@ -15,6 +15,7 @@ import org.sid.ebankbackend.repositories.CustomerRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -63,6 +64,13 @@ public class EBankServiceImpl implements IEBankService {
         Customer customer = customerRepository.findById(id).orElseThrow(()-> new CustomerNotFoundException("Customer not found!"));
         CustomerDTO customerDTO = bankAccountMapper.fromCustomer(customer);
         return customerDTO;
+    }
+
+    @Override
+    public List<CustomerDTO> searchForCustumers(String keyword) {
+        List<Customer> customers = customerRepository.searchForCustomer(keyword);
+        List<CustomerDTO> customerDTOS = customers.stream().map(customer -> bankAccountMapper.fromCustomer(customer)).collect(Collectors.toList());
+        return customerDTOS;
     }
 
     @Override
@@ -128,6 +136,22 @@ public class EBankServiceImpl implements IEBankService {
                 })
                 .collect(Collectors.toList());
         return bankAccountDTOList;
+    }
+
+    @Override
+    public List<BankAccountDTO> getBankAccountsByCustomerId(Long customerId) {
+        List<BankAccount> bankAccounts = bankAccountRepository.findByCustomerId(customerId);
+        List<BankAccountDTO> bankAccountDTOS = bankAccounts.stream().map(bankAccount -> {
+                    if (bankAccount instanceof SavingAccount) {
+                        SavingAccount savingAccount = (SavingAccount) bankAccount;
+                        return bankAccountMapper.fromSavingAccount(savingAccount);
+                    } else {
+                        CurrentAccount currentAccount = (CurrentAccount) bankAccount;
+                        return bankAccountMapper.fromCurrentAccount(currentAccount);
+                    }
+                }
+        ).collect(Collectors.toList());
+        return bankAccountDTOS;
     }
 
     @Override
@@ -208,7 +232,7 @@ public class EBankServiceImpl implements IEBankService {
     @Override
     public AccountHistoryDTO getAccountHistory(String id, int page, int size) throws BankAccountNotFoundException {
         BankAccount bankAccount = bankAccountRepository.findById(id).orElseThrow(()->new BankAccountNotFoundException("Bank Acc not found!"));
-        Page<AccountOperation> accountOperations = accountOperationRepository.findByBankAccountId(id, PageRequest.of(page,size));
+        Page<AccountOperation> accountOperations = accountOperationRepository.findByBankAccountIdOrderByIdDesc(id, PageRequest.of(page,size));
         AccountHistoryDTO accountHistoryDTO = new AccountHistoryDTO();
         List<AccountOperationDTO> accountOperationDTOS = accountOperations.stream().map(accountOperation -> bankAccountMapper.fromAccountOperation(accountOperation)).collect(Collectors.toList());
         accountHistoryDTO.setAccountOperationDTOS(accountOperationDTOS);
