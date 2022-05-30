@@ -1,7 +1,7 @@
-#REST API with Spring
+# REST API with Spring
 - This project is a rest api application using a Mysql database for managing a bank's clients and their accounts by providing infomation about their operations history.
 
-#API Documentation provided by SwaggerUI
+# API Documentation provided by SwaggerUI
 
 - Customer controller :
 
